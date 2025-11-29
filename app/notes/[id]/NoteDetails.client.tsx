@@ -10,6 +10,7 @@ import type { DehydratedState } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { fetchNoteById } from "@/lib/api/api";
 import css from "./NoteDetails.module.css";
+import { useState } from "react";
 
 interface NoteDetailsClientProps {
   dehydratedState: DehydratedState | null;
@@ -18,7 +19,7 @@ interface NoteDetailsClientProps {
 export default function NoteDetailsClient({
   dehydratedState,
 }: NoteDetailsClientProps) {
-  const queryClient = new QueryClient();
+  const [queryClient] = useState(() => new QueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
