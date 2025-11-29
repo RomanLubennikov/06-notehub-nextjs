@@ -1,6 +1,6 @@
 "use client";
 
-import css from "@/styles/SearchBox.module.css";
+import css from "./SearchBox.module.css";
 
 interface Props {
   value: string;

@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { createNote } from "@/lib/api/api";
 import type { CreateNoteInput, NoteTag } from "@/types/note";
-import css from "@/styles/NoteForm.module.css";
+import css from "./NoteForm.module.css";
 
 interface Props {
   onCancel: () => void;
