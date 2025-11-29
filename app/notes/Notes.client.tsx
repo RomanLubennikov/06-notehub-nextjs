@@ -1,50 +1,59 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { HydrationBoundary } from "@tanstack/react-query";
-import type { DehydratedState } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { fetchNotes } from "@/lib/api";
+
 import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
 import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
+import NoteList from "@/components/NoteList/NoteList";
+
 import css from "./NotesPage.module.css";
 
-export default function NotesClient({
-  dehydratedState,
-}: {
-  dehydratedState: DehydratedState | null;
-}) {
-  return (
-    <HydrationBoundary state={dehydratedState}>
-      <NotesClientInner />
-    </HydrationBoundary>
-  );
+function useDebounce<T>(value: T, delay = 400): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+
+  return debounced;
 }
 
-function NotesClientInner() {
+export default function NotesClient() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
 
+  const debouncedSearch = useDebounce(search, 400);
+
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["notes", { search, page }],
+    queryKey: ["notes", { search: debouncedSearch, page }],
     queryFn: () =>
       fetchNotes({
-        search,
+        search: debouncedSearch,
         page,
         perPage: 12,
       }),
+    refetchOnMount: false,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (error || !data) return <p>Something went wrong.</p>;
+  if (isLoading) return <p>Loading...</p>;
+  if (error || !data) return <p>Something went wrong</p>;
 
   return (
     <div className={css.container}>
       <div className={css.header}>
-        <SearchBox value={search} onChange={setSearch} />
+        <SearchBox
+          value={search}
+          onChange={(v) => {
+            setSearch(v);
+            setPage(1);
+          }}
+        />
 
         <button className={css.addButton} onClick={() => setIsOpen(true)}>
           Add note
@@ -63,23 +72,15 @@ function NotesClientInner() {
         </Modal>
       )}
 
-      <div className={css.list}>
-        {data.notes.length === 0 && <p>No notes found.</p>}
+      <NoteList notes={data.notes} />
 
-        {data.notes.map((note) => (
-          <div key={note.id} className={css.note}>
-            <h3>{note.title}</h3>
-            <p>{note.content}</p>
-            <span>{note.tag}</span>
-          </div>
-        ))}
-      </div>
-
-      <Pagination
-        currentPage={page}
-        pageCount={data.totalPages}
-        onPageChange={setPage}
-      />
+      {data.totalPages > 1 && (
+        <Pagination
+          currentPage={page}
+          pageCount={data.totalPages}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }

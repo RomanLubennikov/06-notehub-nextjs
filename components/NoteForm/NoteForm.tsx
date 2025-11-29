@@ -14,12 +14,15 @@ interface Props {
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Title is required"),
-  content: Yup.string().required("Content is required"),
+
+  content: Yup.string()
+    .max(500, "Content cannot exceed 500 characters")
+    .optional(),
+
   tag: Yup.mixed<NoteTag>()
     .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"])
-    .required(),
+    .required("Tag is required"),
 });
-
 export default function NoteForm({ onCancel, onSuccess }: Props) {
   const qc = useQueryClient();
   const mutation = useMutation({

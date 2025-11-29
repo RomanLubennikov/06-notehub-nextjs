@@ -18,12 +18,12 @@ export interface FetchNotesParams {
   search?: string;
 }
 
-export type FetchNotesResponse = {
+export interface FetchNotesResponse {
   notes: Note[];
   totalPages: number;
   page: number;
   total: number;
-};
+}
 
 export async function fetchNotes(params: FetchNotesParams) {
   const res = await api.get<FetchNotesResponse>("/notes", { params });
@@ -31,16 +31,16 @@ export async function fetchNotes(params: FetchNotesParams) {
 }
 
 export async function fetchNoteById(id: string) {
-  const res = await api.get<{ note: Note }>(`/notes/${id}`);
-  return res.data.note;
+  const res = await api.get<Note>(`/notes/${id}`);
+  return res.data;
 }
 
 export async function createNote(data: CreateNoteInput) {
-  const res = await api.post("/notes", data);
+  const res = await api.post<Note>("/notes", data);
   return res.data;
 }
 
 export async function deleteNote(id: string) {
-  const res = await api.delete(`/notes/${id}`);
+  const res = await api.delete<{ message: string }>(`/notes/${id}`);
   return res.data;
 }
