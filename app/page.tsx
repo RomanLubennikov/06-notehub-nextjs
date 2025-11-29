@@ -1,4 +1,4 @@
-import css from "@/styles/page.module.css";
+import css from "./page.module.css";
 
 export default function HomePage() {
   return (
