@@ -7,7 +7,7 @@ import { createNote } from "@/lib/api";
 import type { CreateNoteInput, NoteTag } from "@/types/note";
 import css from "./NoteForm.module.css";
 
-interface Props {
+interface NoteFormProps {
   onCancel: () => void;
   onSuccess?: () => void;
 }
@@ -23,7 +23,7 @@ const validationSchema = Yup.object({
     .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"])
     .required("Tag is required"),
 });
-export default function NoteForm({ onCancel, onSuccess }: Props) {
+export default function NoteForm({ onCancel, onSuccess }: NoteFormProps) {
   const qc = useQueryClient();
   const mutation = useMutation({
     mutationFn: (payload: CreateNoteInput) => createNote(payload),

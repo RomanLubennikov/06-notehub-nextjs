@@ -39,6 +39,7 @@ export default function NotesClient() {
         perPage: 12,
       }),
     refetchOnMount: false,
+    placeholderData: (previousData) => previousData,
   });
 
   if (isLoading) return <p>Loading...</p>;
